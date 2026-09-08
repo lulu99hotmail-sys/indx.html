@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>رصد | تقارير عمادة شؤون الطلاب</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root { --blue:#00529b; --navy:#003b70; --turq:#00a6a6; --mint:#e8f7f7; --sky:#eaf3fa; --bg:#f7f9fc; --ink:#17324d; --muted:#64748b; --line:#dce5ee; --green:#159a6b; --orange:#e59a23; --red:#d9534f; --white:#fff; --shadow:0 18px 45px rgba(0,59,112,.08); --qu-blue:#0c3e7a; --qu-blue-dark:#072d52; }
+		* { box-sizing:border-box; }
+		body { margin:0; background:var(--bg); color:var(--ink); font-family:"IBM Plex Sans Arabic",sans-serif; }
+		button, input, select, textarea { font:inherit; }
+		button { cursor:pointer; border:0; }
+		.app { min-height:100vh; display:flex; }
+		.sidebar { width:260px; background:linear-gradient(165deg,var(--navy),#006899 72%,#00a6a6); color:#fff; padding:28px 18px; display:flex; flex-direction:column; flex-shrink:0; }
+		.brand { display:flex; align-items:center; gap:12px; padding:0 10px 32px; border-bottom:1px solid rgba(255,255,255,.18); }
+		.brand-mark { width:44px; height:44px; border-radius:12px; background:#fff; color:var(--blue); display:grid; place-items:center; font-weight:700; font-size:20px; box-shadow:0 7px 20px rgba(0,0,0,.12); }
+		.brand strong { display:block; font-size:17px; }
+		.brand small { opacity:.74; font-size:11px; }
+		.nav { padding-top:25px; display:grid; gap:7px; }
+		.nav button { color:rgba(255,255,255,.8); background:transparent; text-align:right; padding:13px 14px; border-radius:9px; display:flex; align-items:center; gap:12px; transition:.2s; }
+		.nav button:hover, .nav button.active { color:#fff; background:rgba(255,255,255,.15); }
+		.nav-icon { width:24px; text-align:center; font-size:18px; }
+		.sidebar-footer { margin-top:auto; padding:16px 10px 0; border-top:1px solid rgba(255,255,255,.18); font-size:12px; color:rgba(255,255,255,.7); }
+		.main { flex:1; min-width:0; }
+		.topbar { height:82px; display:flex; align-items:center; justify-content:space-between; padding:0 42px; background:#fff; border-bottom:1px solid var(--line); }
+		.crumb { color:var(--muted); font-size:13px; }
+		.top-actions { display:flex; align-items:center; gap:18px; }
+		.icon-button { position:relative; width:40px; height:40px; border-radius:10px; background:var(--sky); color:var(--blue); font-size:18px; }
+		.badge { position:absolute; top:-4px; left:-3px; min-width:17px; height:17px; padding:0 4px; border-radius:9px; background:var(--red); color:#fff; font-size:10px; display:grid; place-items:center; border:2px solid #fff; }
+		.profile { display:flex; align-items:center; gap:10px; padding-right:16px; border-right:1px solid var(--line); }
+		.avatar { width:38px; height:38px; display:grid; place-items:center; background:var(--mint); color:var(--turq); border-radius:50%; font-weight:700; }
+		.profile strong { display:block; font-size:13px; }
+		.profile small { color:var(--muted); font-size:11px; }
+		.content { padding:34px 42px 50px; max-width:1500px; margin:auto; }
+		.welcome { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:30px; }
+		h1, h2, h3, p { margin:0; }
+		h1 { font-size:29px; letter-spacing:0; margin-bottom:7px; }
+		.welcome p { color:var(--muted); font-size:14px; }
+		.primary { background:var(--blue); color:#fff; padding:12px 18px; border-radius:8px; font-weight:600; box-shadow:0 8px 18px rgba(0,82,155,.18); transition:.2s; }
+		.primary:hover { background:var(--navy); transform:translateY(-1px); }
+		.secondary { background:#fff; color:var(--blue); border:1px solid var(--line); padding:11px 16px; border-radius:8px; font-weight:600; }
+		.stats { display:grid; grid-template-columns:repeat(5,1fr); gap:15px; margin-bottom:26px; }
+		.stat { background:#fff; border:1px solid var(--line); padding:18px; border-radius:10px; min-width:0; position:relative; overflow:hidden; }
+		.stat:after { content:""; width:58px; height:58px; border-radius:50%; background:var(--mint); position:absolute; left:-20px; top:-20px; }
+		.stat .label { color:var(--muted); font-size:12px; position:relative; z-index:1; }
+		.stat strong { display:block; font-size:27px; margin-top:7px; position:relative; z-index:1; }
+		.stat .trend { color:var(--green); font-size:11px; margin-top:6px; display:block; }
+		.stat.warning .trend { color:var(--orange); }
+		.panel { background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:var(--shadow); }
+		.panel-head { min-height:73px; display:flex; align-items:center; justify-content:space-between; gap:15px; padding:17px 21px; border-bottom:1px solid var(--line); }
+		.panel-head h2 { font-size:17px; }
+		.panel-head p { color:var(--muted); font-size:12px; margin-top:4px; }
+		.filters { display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+		.search { position:relative; }
+		.search input { width:250px; padding:10px 38px 10px 12px; border:1px solid var(--line); border-radius:7px; outline:0; color:var(--ink); }
+		.search input:focus, select:focus, textarea:focus { border-color:var(--turq); box-shadow:0 0 0 3px rgba(0,166,166,.1); }
+		.search span { position:absolute; right:12px; top:8px; color:var(--muted); }
+		select { border:1px solid var(--line); border-radius:7px; padding:10px 12px; color:var(--ink); background:#fff; outline:0; }
+		table { width:100%; border-collapse:collapse; }
+		th { text-align:right; color:var(--muted); font-size:12px; font-weight:500; background:#fbfcfe; }
+		th, td { padding:16px 21px; border-bottom:1px solid #edf1f5; }
+		td { font-size:13px; vertical-align:middle; }
+		tr:last-child td { border-bottom:0; }
+		.report-title { font-weight:600; color:var(--ink); }
+		.report-meta { color:var(--muted); font-size:11px; margin-top:4px; }
+		.status { display:inline-flex; align-items:center; gap:6px; padding:5px 9px; border-radius:20px; font-size:11px; white-space:nowrap; }
+		.status:before { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+		.status.approved { background:#e9f8f1; color:var(--green); }
+		.status.pending { background:#fff5e5; color:var(--orange); }
+		.status.revision { background:#fff0ef; color:var(--red); }
+		.status.draft { background:#f0f3f6; color:#708092; }
+		.row-actions { display:flex; gap:5px; }
+		.row-actions button { color:var(--blue); background:transparent; padding:6px; font-size:12px; }
+		.row-actions button:hover { background:var(--sky); border-radius:5px; }
+		.empty { padding:55px 20px; text-align:center; color:var(--muted); display:none; }
+		.empty b { display:block; color:var(--ink); margin-bottom:5px; }
+		.toast { position:fixed; bottom:25px; left:25px; background:var(--navy); color:#fff; padding:14px 20px; border-radius:8px; box-shadow:var(--shadow); transform:translateY(100px); opacity:0; transition:.3s; z-index:20; font-size:13px; }
+		.toast.show { transform:translateY(0); opacity:1; }
+		.modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,32,62,.42); z-index:10; align-items:center; justify-content:center; padding:20px; }
+		.modal-backdrop.open { display:flex; }
+		.modal { width:min(600px,100%); max-height:92vh; overflow:auto; background:#fff; border-radius:12px; box-shadow:0 25px 70px rgba(0,35,70,.2); animation:rise .22s ease; }
+		@keyframes rise { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+		.modal-head { display:flex; justify-content:space-between; align-items:center; padding:20px 24px; border-bottom:1px solid var(--line); }
+		.modal-head h2 { font-size:19px; }
+		.close { background:var(--bg); color:var(--muted); width:30px; height:30px; border-radius:7px; font-size:20px; }
+		.form { padding:22px 24px; display:grid; gap:16px; }
+		.field { display:grid; gap:7px; }
+		.field label { font-size:12px; font-weight:600; }
+		.field input, .field textarea, .field select { width:100%; border:1px solid var(--line); border-radius:7px; padding:11px 12px; outline:0; color:var(--ink); }
+		.field textarea { min-height:105px; resize:vertical; }
+		.form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+		.upload { border:1px dashed #9ab6cc; background:var(--sky); border-radius:8px; padding:15px; color:var(--blue); font-size:12px; }
+		.upload input { display:block; margin-top:8px; font-size:11px; }
+		.modal-actions { display:flex; justify-content:flex-start; gap:9px; padding-top:4px; }
+		.notice-list { padding:5px 20px 20px; }
+		.notice { padding:14px 4px; border-bottom:1px solid var(--line); font-size:13px; }
+		.notice small { color:var(--muted); display:block; margin-top:5px; }
+		@media (max-width:1050px) { .stats { grid-template-columns:repeat(3,1fr); } .content { padding:28px 24px 45px; } .topbar { padding:0 24px; } }
+		@media (max-width:760px) { .sidebar { width:66px; padding:20px 9px; } .brand { padding:0 0 22px; justify-content:center; border:0; } .brand div:last-child, .nav button span:not(.nav-icon), .sidebar-footer { display:none; } .nav button { justify-content:center; padding:13px 5px; } .topbar { height:70px; padding:0 16px; } .crumb { display:none; } .content { padding:24px 14px 40px; } .welcome { align-items:flex-start; gap:18px; flex-direction:column; } h1 { font-size:24px; } .stats { grid-template-columns:repeat(2,1fr); gap:10px; } .stat { padding:14px; } .stat strong { font-size:23px; } .panel-head { align-items:flex-start; flex-direction:column; } .filters, .search, .search input { width:100%; } .filters select { flex:1; min-width:0; } table, thead, tbody, tr, th, td { display:block; } thead { display:none; } tr { padding:13px 17px; border-bottom:1px solid var(--line); } td { padding:6px 0; border:0; display:flex; justify-content:space-between; gap:14px; } td:before { content:attr(data-label); color:var(--muted); font-size:11px; } td:first-child { display:block; } td:first-child:before { display:none; } .form-row { grid-template-columns:1fr; } .profile { padding-right:8px; } .profile div:last-child { display:none; } }
+		.auth-screen { min-height:100vh; display:grid; place-items:center; padding:24px; background:linear-gradient(135deg, var(--qu-blue-dark) 0%, var(--qu-blue) 100%); }
+		.auth-card { width:min(470px,100%); background:#fff; border:1px solid rgba(12,62,122,.18); border-radius:24px; padding:32px 30px 24px; box-shadow:0 24px 70px rgba(7,45,82,.25); }
+		.auth-brand { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+		.auth-brand .brand-mark { background:linear-gradient(135deg, var(--qu-blue), var(--turq)); color:#fff; box-shadow:0 12px 28px rgba(12,62,122,.22); }
+		.auth-brand strong { display:block; font-size:18px; color:var(--qu-blue); }
+		.auth-brand small { color:var(--muted); font-size:12px; }
+		.auth-heading { margin-bottom:18px; }
+		.auth-card h1 { font-size:26px; line-height:1.5; margin:0 0 4px; color:var(--ink); }
+		.auth-card > p { color:var(--muted); font-size:13px; margin-bottom:24px; }
+		.auth-heading p { font-size:16px; color:rgba(12,62,122,.76); font-weight:500; margin:0; }
+		.auth-form { display:grid; gap:16px; }
+		.auth-form .primary { width:100%; margin-top:6px; }
+		.auth-field { position:relative; }
+		.auth-field .auth-icon { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:16px; }
+		.auth-field input { width:100%; border:1px solid var(--line); border-radius:12px; padding:13px 42px 13px 14px; outline:0; color:var(--ink); background:#fbfdff; transition:border-color .2s, box-shadow .2s, background .2s; }
+		.auth-field input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(0,82,155,.08); background:#fff; }
+		.auth-meta { display:flex; justify-content:flex-end; margin-top:-3px; }
+		.muted-link { color:rgba(0,82,155,.78); font-size:12px; text-decoration:none; }
+		.muted-link:hover { text-decoration:underline; }
+		.auth-switch { border-top:1px solid var(--line); margin-top:22px; padding-top:18px; display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
+		.link { background:transparent; color:var(--blue); font-weight:600; padding:3px; }
+		.auth-error { display:none; color:var(--red); background:#fff0ef; padding:10px 12px; border-radius:8px; font-size:12px; }
+		.auth-card .field { display:grid; gap:7px; }
+		.auth-card .field label { font-size:12px; font-weight:600; color:var(--ink); }
+		.page { display:none; } .page.visible { display:flex; } .program-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:13px; padding:20px; } .program { border:1px solid var(--line); border-right:4px solid var(--turq); border-radius:10px; padding:15px; background:linear-gradient(145deg,#fff,var(--mint)); } .program small { color:var(--turq); font-weight:600; } .program strong { display:block; margin:8px 0 4px; } .program p { color:var(--muted); font-size:12px; line-height:1.7; } .section-gap { margin-top:25px; } .role-pill { display:inline-block; color:var(--blue); background:var(--sky); padding:4px 9px; border-radius:12px; font-size:11px; }
+		@media (max-width:760px) { .auth-card { padding:25px 20px; } .program-grid { grid-template-columns:1fr; } }
+	</style>
+</head>
+<body>
+	<section class="auth-screen" id="authScreen">
+		<div class="auth-card" id="loginCard">
+			<div class="auth-brand">
+				<div class="brand-mark">ق</div>
+				<div>
+					<strong>رصد</strong>
+					<small>عمادة شؤون الطلاب</small>
+				</div>
+			</div>
+			<div class="auth-heading">
+				<h1>منصة رصد تقارير وبرامج عمادة شؤون الطلاب</h1>
+				<p>جامعة القصيم</p>
+			</div>
+			<div class="auth-error" id="authError"></div>
+			<form class="auth-form" id="loginForm">
+				<div class="field">
+					<label for="loginEmail">البريد الإلكتروني</label>
+					<div class="auth-field">
+						<span class="auth-icon">✉</span>
+						<input id="loginEmail" type="email" required placeholder="name@qu.edu.sa">
+					</div>
+				</div>
+				<div class="field">
+					<label for="loginPassword">كلمة المرور</label>
+					<div class="auth-field">
+						<span class="auth-icon">🔒</span>
+						<input id="loginPassword" type="password" required minlength="6" placeholder="••••••••">
+					</div>
+				</div>
+				<div class="auth-meta">
+					<a href="#" class="muted-link">نسيت كلمة المرور؟</a>
+				</div>
+				<button class="primary" type="submit">تسجيل الدخول</button>
+			</form>
+			<div class="auth-switch"><span>ممثل وحدة جديد؟</span><button class="link" id="showRegister" type="button">إنشاء حساب ممثل</button></div>
+			<div class="auth-switch"><span>لإدارة النظام</span><button class="link" id="showAdmin" type="button">دخول المشرف</button></div>
+			<div style="margin-top:14px; text-align:center; color:rgba(12,62,122,.6); font-size:11px;">© جامعة القصيم</div>
+		</div>
+		<div class="auth-card" id="registerCard" style="display:none"><div class="auth-brand"><div class="brand-mark">ق</div><div><strong>رصد</strong><small>إنشاء حساب ممثل وحدة</small></div></div><h1>إنشاء حساب</h1><p>الحسابات العامة متاحة لممثلي الوحدات فقط.</p><div class="auth-error" id="registerError"></div><form class="auth-form" id="registerForm"><div class="field"><label for="registerName">الاسم الكامل</label><input id="registerName" required></div><div class="field"><label for="registerEmail">البريد الإلكتروني</label><input id="registerEmail" type="email" required></div><div class="field"><label for="registerUnit">الوحدة</label><select id="registerUnit" required></select></div><div class="form-row"><div class="field"><label for="registerPassword">كلمة المرور</label><input id="registerPassword" type="password" minlength="6" required></div><div class="field"><label for="registerConfirm">تأكيد كلمة المرور</label><input id="registerConfirm" type="password" minlength="6" required></div></div><button class="primary" type="submit">إنشاء الحساب</button></form><div class="auth-switch"><span>لديك حساب؟</span><button class="link" id="backLogin" type="button">العودة للدخول</button></div></div>
+		<div class="auth-card" id="adminCard" style="display:none"><div class="auth-brand"><div class="brand-mark">ق</div><div><strong>رصد</strong><small>بوابة مشرف الموقع</small></div></div><h1>دخول المشرف</h1><p>هذه البوابة مخصصة لحسابات الإدارة المعتمدة.</p><div class="auth-error" id="adminError"></div><form class="auth-form" id="adminForm"><div class="field"><label for="adminEmail">البريد الإلكتروني</label><input id="adminEmail" type="email" required></div><div class="field"><label for="adminPassword">كلمة المرور</label><input id="adminPassword" type="password" required></div><button class="primary" type="submit">دخول لوحة الإدارة</button></form><div class="auth-switch"><span>هل أنت ممثل وحدة؟</span><button class="link" id="backAdminLogin" type="button">دخول الوحدات</button></div></div>
+	</section>
+	<div class="app page" id="appPage">
+		<aside class="sidebar">
+			<div class="brand"><div class="brand-mark">ق</div><div><strong>رصد</strong><small>عمادة شؤون الطلاب</small></div></div>
+			<nav class="nav">
+				<button class="active" data-view="dashboard"><span class="nav-icon">▦</span><span id="dashboardNavLabel">الرئيسية</span></button>
+				<button class="admin-only" data-view="admin"><span class="nav-icon">⚙</span><span>إدارة النظام</span></button>
+				<button data-view="reports"><span class="nav-icon">▤</span><span>تقاريري</span></button>
+				<button id="openNotifications"><span class="nav-icon">♢</span><span>الإشعارات</span></button>
+				<button data-view="help"><span class="nav-icon">?</span><span>المساعدة</span></button>
+			</nav>
+			<div class="sidebar-footer">جامعة القصيم<br>نسخة العرض المحلي 1.0</div>
+		</aside>
+		<main class="main">
+			<header class="topbar"><span class="crumb">لوحة التحكم / الصفحة الرئيسية</span><div class="top-actions"><button class="icon-button" id="notificationButton" title="الإشعارات">♢<span class="badge" id="notificationCount">0</span></button><div class="profile"><div class="avatar" id="avatar">س</div><div><strong id="userName">سارة العتيبي</strong><small id="userRole">ممثل وحدة الموهبة والابتكار</small></div></div><button class="link" id="logout">خروج</button></div></header>
+			<section class="content">
+				<div class="welcome"><div><h1>مرحبًا، <span id="welcomeName">سارة</span> <span aria-hidden="true">👋</span></h1><p id="welcomeUnit">تابع تقارير وحدتك وبرامجها الأسبوعية.</p></div><button class="primary" id="newReport">＋ إضافة تقرير جديد</button></div>
+				<div class="stats">
+					<div class="stat"><span class="label">المنجزات المحققة</span><strong id="achievementCount">0</strong><span class="trend">منجز موثق</span></div><div class="stat"><span class="label">التقارير المعتمدة</span><strong id="approvedCount">0</strong><span class="trend">تمت مراجعتها</span></div><div class="stat warning"><span class="label">قيد المراجعة</span><strong id="pendingCount">0</strong><span class="trend">بانتظار الإجراء</span></div><div class="stat"><span class="label">التقارير المرفوعة</span><strong id="uploadedCount">0</strong><span class="trend">من البيانات الحالية</span></div><div class="stat"><span class="label">إجمالي البرامج</span><strong id="programCount">0</strong><span class="trend">برامج هذا الأسبوع</span></div>
+				</div>
+				<section class="panel section-gap"><div class="panel-head"><div><h2>برامج الأسبوع</h2><p>البرامج المرتبطة بوحدتك</p></div><button class="secondary" id="newProgram">＋ إضافة برنامج</button></div><div class="program-grid" id="programGrid"></div><div class="empty" id="programEmpty"><b>لا توجد برامج هذا الأسبوع</b>أضف أول برنامج لوحدتك.</div></section>
+				<section class="panel">
+					<div class="panel-head"><div><h2>تقارير الوحدة</h2><p>تابع حالة التقارير والمنجزات الموثقة</p></div><div class="filters"><div class="search"><span>⌕</span><input id="search" type="search" placeholder="ابحث في التقارير..."></div><select id="statusFilter"><option value="all">كل الحالات</option><option value="approved">معتمد</option><option value="pending">قيد المراجعة</option><option value="revision">يحتاج تعديل</option><option value="draft">مسودة</option></select><select id="categoryFilter"><option value="all">كل التصنيفات</option><option>تقارير مجتمعية</option><option>تقارير صحية</option><option>تقارير بيئية</option><option>تقارير وطنية</option><option>تقارير رياضية</option><option>تقارير ابتكارية</option></select></div></div>
+					<table><thead><tr><th>المشاركة / المنجز</th><th>التصنيف</th><th>التاريخ</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody id="reportsBody"></tbody></table><div class="empty" id="empty"><b>لا توجد تقارير مطابقة</b>جرّب تغيير البحث أو الفلاتر.</div>
+				</section>
+			</section>
+		</main>
+	</div>
+	<div class="toast" id="toast"></div>
+	<div class="modal-backdrop" id="reportModal"><div class="modal"><div class="modal-head"><h2 id="modalTitle">إضافة تقرير جديد</h2><button class="close" data-close="reportModal">×</button></div><form class="form" id="reportForm"><input type="hidden" id="editId"><div class="field"><label for="reportUnit">الوحدة *</label><select id="reportUnit" required></select></div><div class="field"><label for="reportName">اسم المشاركة أو المنجز *</label><input id="reportName" required placeholder="مثال: مسابقة الابتكار الطلابي"></div><div class="form-row"><div class="field"><label for="reportCategory">التصنيف *</label><select id="reportCategory" required><option>تقارير مجتمعية</option><option>تقارير صحية</option><option>تقارير بيئية</option><option>تقارير وطنية</option><option>تقارير رياضية</option><option>تقارير ابتكارية</option></select></div><div class="field"><label for="reportDate">تاريخ الإنجاز *</label><input id="reportDate" type="date" required></div></div><div class="field"><label for="reportDescription">وصف مختصر *</label><textarea id="reportDescription" required placeholder="اكتب وصفًا واضحًا للمنجز والنتيجة..."></textarea></div><div class="field"><label for="reportAchievement">المركز أو النتيجة</label><input id="reportAchievement" placeholder="مثال: المركز الأول"></div><div class="upload"><b>صور التوثيق</b><br>الجودة واضحة، JPG أو PNG أو WEBP، وبحد أقصى 10MB<input type="file" id="reportImages" accept="image/jpeg,image/png,image/webp" multiple></div><div class="modal-actions"><button type="button" class="secondary" data-close="reportModal">إلغاء</button><button type="submit" class="primary" id="saveDraft">حفظ كمسودة</button><button type="button" class="primary" id="submitReport">إرسال للمراجعة</button></div></form></div></div>
+	<div class="modal-backdrop" id="programModal"><div class="modal"><div class="modal-head"><h2>رفع برنامج الأسبوع</h2><button class="close" data-close="programModal">×</button></div><form class="form" id="programForm"><div class="field"><label for="programUnit">الوحدة *</label><select id="programUnit" required></select></div><div class="field"><label for="programTitle">اسم البرنامج *</label><input id="programTitle" required></div><div class="form-row"><div class="field"><label for="programType">نوع البرنامج *</label><select id="programType" required><option value="lecture">محاضرة</option><option value="exhibition">معرض</option><option value="training_course">دورة تدريبية</option><option value="workshop">ورشة عمل</option><option value="tournament">بطولة</option><option value="hackathon">هاكثون</option></select></div><div class="field"><label for="programDate">التاريخ *</label><input id="programDate" type="date" required></div></div><div class="field"><label for="programDescription">وصف مختصر</label><textarea id="programDescription"></textarea></div><div class="modal-actions"><button type="button" class="secondary" data-close="programModal">إلغاء</button><button type="submit" class="primary">حفظ البرنامج</button></div></form></div></div>
+	<div class="modal-backdrop" id="notificationModal"><div class="modal"><div class="modal-head"><h2>مركز الإشعارات</h2><button class="close" data-close="notificationModal">×</button></div><div class="notice-list" id="noticeList"></div></div></div>
+	<script>
+		const units=['وحدة الموهبة والابتكار','وحدة الأنشطة المركزية','وحدة التوجيه والإرشاد','وحدة النشاط الرياضي','ورشة عمادة شؤون الطلاب'];
+		const categories=['تقارير مجتمعية','تقارير صحية','تقارير بيئية','تقارير وطنية','تقارير رياضية','تقارير ابتكارية'];
+		const programTypes={lecture:'محاضرة',exhibition:'معرض',training_course:'دورة تدريبية',workshop:'ورشة عمل',tournament:'بطولة',hackathon:'هاكثون'};
+		const defaultAdmin={name:'مشرف النظام',email:'admin@example.edu.sa',password:'EO28FtbccKBi',role:'admin',unit:null};
+		const state={reports:JSON.parse(localStorage.getItem('qassimReports')||'[]'),programs:JSON.parse(localStorage.getItem('qassimPrograms')||'[]'),users:JSON.parse(localStorage.getItem('qassimUsers')||'[]'),session:JSON.parse(localStorage.getItem('qassimSession')||'null')};
+		state.reports=state.reports.map(report=>({...report,category:categories.includes(report.category)?report.category:categories[0]}));
+		function ensureSeedAdmin(){ if(!state.users.some(user=>user.email===defaultAdmin.email)){ state.users.push({...defaultAdmin}); localStorage.setItem('qassimUsers',JSON.stringify(state.users)); } }
+		ensureSeedAdmin();
+		const authScreen=document.getElementById('authScreen'), appPage=document.getElementById('appPage');
+		const labels = {approved:'معتمد',pending:'قيد المراجعة',revision:'يحتاج تعديل',draft:'مسودة'};
+		const body = document.getElementById('reportsBody');
+		const formatDate = value => new Intl.DateTimeFormat('ar-SA',{day:'numeric',month:'short',year:'numeric'}).format(new Date(value));
+		function save(){localStorage.setItem('qassimReports',JSON.stringify(state.reports));localStorage.setItem('qassimPrograms',JSON.stringify(state.programs));localStorage.setItem('qassimUsers',JSON.stringify(state.users));}
+		function error(id,message){const el=document.getElementById(id);el.textContent=message;el.style.display='block';}
+		function clearErrors(){document.querySelectorAll('.auth-error').forEach(el=>{el.textContent='';el.style.display='none';});}
+		function fillUnits(){['registerUnit','reportUnit','programUnit'].forEach(id=>{const el=document.getElementById(id);el.innerHTML=units.map(unit=>`<option>${unit}</option>`).join('');});}
+		function scoped(list){if(!state.session||state.session.role==='admin')return list;return list.filter(item=>item.unit===state.session.unit);}
+		function showAuth(card){authScreen.style.display='grid';appPage.classList.remove('visible');document.querySelectorAll('.auth-card').forEach(el=>el.style.display='none');document.getElementById(card).style.display='block';clearErrors();}
+		function enter(user){state.session=user;localStorage.setItem('qassimSession',JSON.stringify(user));authScreen.style.display='none';appPage.classList.add('visible');document.getElementById('userName').textContent=user.name;document.getElementById('userRole').textContent=user.role==='admin'?'مشرف الموقع':`ممثل ${user.unit}`;document.getElementById('welcomeName').textContent=user.name.split(' ')[0];document.getElementById('welcomeUnit').textContent=user.role==='admin'?'صلاحيات إدارة شاملة لكل الوحدات.':`إليك ملخص نشاط ${user.unit} لهذا العام.`;document.getElementById('avatar').textContent=user.name.charAt(0);document.getElementById('reportUnit').disabled=user.role!=='admin';document.getElementById('programUnit').disabled=user.role!=='admin';document.querySelectorAll('.admin-only').forEach(el=>el.style.display=user.role==='admin'?'flex':'none');document.getElementById('dashboardNavLabel').textContent=user.role==='admin'?'لوحة التحكم':'الرئيسية';render();}
+		function render() {
+			const query = document.getElementById('search').value.trim().toLowerCase();
+			const status = document.getElementById('statusFilter').value;
+			const category = document.getElementById('categoryFilter').value;
+			const reports=scoped(state.reports); const filtered = reports.filter(r => (!query || `${r.name} ${r.description}`.toLowerCase().includes(query)) && (status==='all' || r.status===status) && (category==='all' || r.category===category));
+			body.innerHTML = filtered.map(r => `<tr><td data-label="المشاركة"><div class="report-title">${r.name}</div><div class="report-meta">${r.achievement || 'بدون نتيجة محددة'}</div></td><td data-label="التصنيف">${r.category}</td><td data-label="التاريخ">${formatDate(r.date)}</td><td data-label="الحالة"><span class="status ${r.status}">${labels[r.status]}</span></td><td data-label="الإجراءات"><div class="row-actions"><button data-action="view" data-id="${r.id}">عرض</button><button data-action="edit" data-id="${r.id}">تعديل</button>${r.status==='draft' ? `<button data-action="delete" data-id="${r.id}">حذف</button>` : ''}</div></td></tr>`).join('');
+			document.getElementById('empty').style.display = filtered.length ? 'none' : 'block';
+			document.getElementById('uploadedCount').textContent=reports.filter(r=>r.status!=='draft').length;document.getElementById('approvedCount').textContent=reports.filter(r=>r.status==='approved').length;document.getElementById('pendingCount').textContent=reports.filter(r=>r.status==='pending').length;document.getElementById('achievementCount').textContent=reports.filter(r=>r.achievement).length;
+			const programs=scoped(state.programs);document.getElementById('programGrid').innerHTML=programs.map(p=>`<article class="program"><small>${programTypes[p.programType]||'برنامج'} · ${formatDate(p.date)}</small><strong>${p.title}</strong><p>${p.description||'برنامج أسبوعي للوحدة'}</p><button class="link" data-program-delete="${p.id}">حذف</button></article>`).join('');document.getElementById('programEmpty').style.display=programs.length?'none':'block';document.getElementById('programCount').textContent=programs.length;
+		}
+		function openReport(report){document.getElementById('reportModal').classList.add('open');document.getElementById('modalTitle').textContent=report?'تعديل التقرير':'إضافة تقرير جديد';document.getElementById('editId').value=report?.id||'';document.getElementById('reportUnit').value=report?.unit||state.session.unit||units[0];document.getElementById('reportName').value=report?.name||'';document.getElementById('reportCategory').value=report?.category||categories[0];document.getElementById('reportDate').value=report?.date||new Date().toISOString().slice(0,10);document.getElementById('reportDescription').value=report?.description||'';document.getElementById('reportAchievement').value=report?.achievement||'';}
+		function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+		function toast(message) { const el=document.getElementById('toast'); el.textContent=message; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2800); }
+		document.getElementById('newReport').onclick = () => openReport();
+		document.querySelectorAll('[data-close]').forEach(b => b.onclick=()=>closeModal(b.dataset.close));
+		document.querySelectorAll('.modal-backdrop').forEach(m => m.onclick=e=>{if(e.target===m) m.classList.remove('open');});
+		['search','statusFilter','categoryFilter'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+		body.addEventListener('click',e=>{const button=e.target.closest('button[data-action]');if(!button)return;const report=state.reports.find(r=>r.id===Number(button.dataset.id));if(button.dataset.action==='edit'&&report.unit===state.session.unit||button.dataset.action==='edit'&&state.session.role==='admin')openReport(report);if(button.dataset.action==='delete'&&confirm('هل تريد حذف المسودة نهائيًا؟')){state.reports=state.reports.filter(r=>r.id!==report.id);save();render();toast('تم حذف المسودة بنجاح.');}if(button.dataset.action==='view')alert(`${report.name}\n\n${report.description}\n\nالحالة: ${labels[report.status]}`);});
+		function submitForm(status){const id=Number(document.getElementById('editId').value);const unit=document.getElementById('reportUnit').value;if(state.session.role!=='admin'&&unit!==state.session.unit)return toast('لا يمكن لممثل الوحدة اختيار وحدة أخرى.');const record={id:id||Date.now(),unit,name:document.getElementById('reportName').value.trim(),category:document.getElementById('reportCategory').value,date:document.getElementById('reportDate').value,status,description:document.getElementById('reportDescription').value.trim(),achievement:document.getElementById('reportAchievement').value.trim()};if(!record.name||!record.date||!record.description)return;const index=state.reports.findIndex(r=>r.id===record.id);if(index>=0)state.reports[index]=record;else state.reports.unshift(record);save();render();closeModal('reportModal');toast(status==='pending'?'تم إرسال التقرير للمراجعة بنجاح.':'تم حفظ التقرير كمسودة بنجاح.');}
+		document.getElementById('reportForm').onsubmit=e=>{e.preventDefault();submitForm('draft');};
+		document.getElementById('submitReport').onclick=()=>{if(document.getElementById('reportForm').reportValidity()) submitForm('pending');};
+		const notices=[];
+		document.getElementById('noticeList').innerHTML=notices.map(n=>`<div class="notice">${n[0]}<small>${n[1]}</small></div>`).join('');
+		function showNotifications(){document.getElementById('notificationModal').classList.add('open');document.getElementById('notificationCount').textContent='0';}
+		document.getElementById('notificationButton').onclick=showNotifications; document.getElementById('openNotifications').onclick=showNotifications;
+		document.querySelectorAll('.nav button[data-view]').forEach(button=>button.onclick=()=>{document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));button.classList.add('active');if(button.dataset.view==='help')toast('لإنشاء تقرير جديد اختر زر إضافة تقرير جديد.');});
+		document.getElementById('newProgram').onclick=()=>{document.getElementById('programModal').classList.add('open');document.getElementById('programUnit').value=state.session.unit||units[0];};
+		document.getElementById('programForm').onsubmit=e=>{e.preventDefault();const unit=document.getElementById('programUnit').value;if(state.session.role!=='admin'&&unit!==state.session.unit)return toast('لا يمكن لممثل الوحدة اختيار وحدة أخرى.');state.programs.push({id:Date.now(),unit,title:document.getElementById('programTitle').value.trim(),programType:document.getElementById('programType').value,date:document.getElementById('programDate').value,description:document.getElementById('programDescription').value.trim(),createdBy:state.session.name,createdAt:new Date().toISOString()});save();render();closeModal('programModal');e.target.reset();toast('تم حفظ البرنامج الأسبوعي بنجاح.');};
+		document.getElementById('programGrid').onclick=e=>{const id=Number(e.target.dataset.programDelete);if(id){state.programs=state.programs.filter(p=>p.id!==id);save();render();toast('تم حذف البرنامج.');}};
+		document.getElementById('logout').onclick=()=>{state.session=null;localStorage.removeItem('qassimSession');showAuth('loginCard');};
+		document.getElementById('showRegister').onclick=()=>showAuth('registerCard');document.getElementById('backLogin').onclick=()=>showAuth('loginCard');document.getElementById('showAdmin').onclick=()=>showAuth('adminCard');document.getElementById('backAdminLogin').onclick=()=>showAuth('loginCard');
+		document.getElementById('loginForm').onsubmit=e=>{e.preventDefault();const email=document.getElementById('loginEmail').value.trim();const password=document.getElementById('loginPassword').value;const user=state.users.find(u=>u.email.toLowerCase()===email.toLowerCase()&&u.password===password);user?enter(user):error('authError','بيانات الدخول غير صحيحة أو الحساب غير موجود.');};
+		document.getElementById('adminForm').onsubmit=e=>{e.preventDefault();const email=document.getElementById('adminEmail').value.trim();const password=document.getElementById('adminPassword').value;if(email.toLowerCase()===defaultAdmin.email.toLowerCase()&&password===defaultAdmin.password)enter(defaultAdmin);else error('adminError','هذه البوابة مخصصة لحساب المشرف فقط.');};
+		document.getElementById('registerForm').onsubmit=e=>{e.preventDefault();const name=document.getElementById('registerName').value.trim(),email=document.getElementById('registerEmail').value.trim(),password=document.getElementById('registerPassword').value,confirmPassword=document.getElementById('registerConfirm').value;if(state.users.some(u=>u.email===email))return error('registerError','هذا البريد مسجّل مسبقًا.');if(password!==confirmPassword)return error('registerError','كلمتا المرور غير متطابقتين.');if(password.length<6)return error('registerError','يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.');const user={name,email,password,unit:document.getElementById('registerUnit').value,role:'representative'};state.users.push(user);save();enter(user);toast('تم إنشاء الحساب بنجاح.');};
+		fillUnits();if(state.session)enter(state.session);else showAuth('loginCard');
+	</script>
+</body>
+</html>
